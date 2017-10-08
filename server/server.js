@@ -28,7 +28,11 @@ app.post('/todos', (req, res) => {
 });
 app.get("/todos", (req, res) => {
     // res.send("Welcome to my ToDo Page");
-    mongoose.Collection('Todo').find().toArray();
+    Todo.find().then((todos) => {
+        res.send({todos});
+    }, (err) => {
+        res.send(e);
+    });
 });
 
 app.get("/", (req, res) => {

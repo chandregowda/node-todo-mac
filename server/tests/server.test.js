@@ -8,8 +8,18 @@ const {
     Todo
 } = require("./../models/todo");
 
+var todos = [{
+    text: "First todo"
+}, {
+    text: "Second todo"
+}];
+
 beforeEach((done) => {
-    Todo.remove({}).then(() => done());
+    Todo.remove({})
+        .then(() => {
+            return Todo.insertMany(todos)
+        })
+        .then(() => done());
 });
 
 describe('POST /todos', () => {
@@ -29,7 +39,7 @@ describe('POST /todos', () => {
                     return done(err);
                 }
 
-                Todo.find().then((todos) => {
+                Todo.find({text}).then((todos) => {
                     expect(todos.length).toBe(1);
                     expect(todos[0].text).toBe(text);
                     done();
@@ -50,7 +60,7 @@ describe('POST /todos', () => {
                     return done(err);
                 }
                 Todo.find().then( (todos) => {
-                    expect(todos.length).toBe(0);
+                    expect(todos.length).toBe(2);
                     done();
                 }).catch((e) => done(e));
             });
@@ -58,3 +68,24 @@ describe('POST /todos', () => {
 
 
 });
+
+describe('GET /todos', () => {
+    it('should get 2 record', (done) => {
+        request(app)
+            .get("/todos")
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todos.length).toBe(2);
+            })
+            .end( (err, res) => {
+                if(err) {
+                    return done(err);
+                }
+
+                Todo.find().then( (todos) => {
+                    expect(todos.length).toBe(2);
+                    done();
+                }).catch((e) => done(e));
+            });
+    }); // should get one record
+})
