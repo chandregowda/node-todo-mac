@@ -94,7 +94,6 @@ describe('GET /todos', () => {
 
     it ('should get one record from todo list', (done) => {
         var id = todos[0]._id.toHexString();
-        console.log("Getting ID", id);
         request(app)
             .get(`/todos/${id}`)
             .expect(200)
@@ -103,4 +102,47 @@ describe('GET /todos', () => {
             })
             .end(done);
     }); // should get one record from todo list
-})
+
+    it('should return 404 as the requested id does not exists', (done) => {
+        var id = new ObjectID();
+        request(app)
+            .get(`/todos/${id}`)
+            .expect(404)
+            .end(done);
+    }); // 404 for non existant id
+
+    it('should return 404 for invalid ID', (done) => {
+        request(app)
+            .get('/todos/123')
+            .expect(404)
+            .end(done);
+    });// 404 for invalid ID
+});
+
+describe('DELETE /todos/:id', () => {
+    it("should return 404 for invalid ID", (done) => {
+        request(app)
+            .delete('/todos/123')
+            .expect(404)
+            .end(done);
+    }); // 404 for Invalid ID
+
+    it('should return 404 for non existant ID', (done) => {
+        var id = new ObjectID();
+        request(app)
+            .delete('/todos/' + id)
+            .expect(404)
+            .end(done);
+    }); // 404 for non existant ID
+
+    it('should return deleted object', (done) => {
+        var id = todos[0]._id.toHexString();
+        request(app)
+            .delete(`/todos/${id}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(todos[0].text);
+            })
+            .end(done);
+    }); // Delete one record
+});
