@@ -1,7 +1,9 @@
 var mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/Todo").then(()=>{
+
+var mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017/Todo";
+mongoose.connect(mongoURI).then(()=>{
     console.log("Successfully connected to mongodb");
 }, (err) => {
     console.log("Failed to connect to MongoDB");

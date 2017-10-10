@@ -8,7 +8,10 @@
     "test-watch":"nodemon --exec npm test",
     "start": "node server/server.js"
   },
-  "author": "",
+  "engines": {
+    "node":"8.0.0"
+  },
+  "author": "Chandre Gowda",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
