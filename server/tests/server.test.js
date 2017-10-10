@@ -1,5 +1,6 @@
 const expect = require("expect");
 const request = require("supertest");
+const {ObjectID} = require("mongodb");
 
 const {
     app
@@ -9,9 +10,11 @@ const {
 } = require("./../models/todo");
 
 var todos = [{
-    text: "First todo"
+    text: "First todo",
+    _id: new ObjectID()
 }, {
-    text: "Second todo"
+    text: "Second todo",
+    _id: new ObjectID()
 }];
 
 beforeEach((done) => {
@@ -88,4 +91,16 @@ describe('GET /todos', () => {
                 }).catch((e) => done(e));
             });
     }); // should get one record
+
+    it ('should get one record from todo list', (done) => {
+        var id = todos[0]._id.toHexString();
+        console.log("Getting ID", id);
+        request(app)
+            .get(`/todos/${id}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(todos[0].text);
+            })
+            .end(done);
+    }); // should get one record from todo list
 })
