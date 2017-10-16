@@ -2,6 +2,8 @@
  * Main server file to start our todo server
  */
 
+require('./config/config'); // Set the environment variables
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const hbs = require("hbs");
@@ -9,12 +11,37 @@ const {ObjectID} = require('mongodb');
 const _ = require("lodash");
 const {mongoose} = require('./utils/mongoose-config');
 const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 
 const PORT = process.env.PORT || 3000;
 
 var app = express();
 app.use(bodyParser.json());
 app.set("view engine", 'hbs');
+
+app.post('/users', (req, res) => {
+    var data = _.pick(req.body, ['email', 'password']);
+    var user = new User(data);
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token)=>{
+        res.header({'x-auth':token}).send(user);
+    }).catch((err) => {
+        res.status(404).send(err);
+    });
+});
+
+app.get('/users/me', (req, res) => {
+    console.log("Getting User for token", req.header('x-auth'));
+    var token = req.header('x-auth');
+
+    User.findByToken(token).then((user) => {
+        if(!user) {
+            return res.status(400).send();
+        }
+        res.send({user});
+    });
+});
 
 app.post('/todos', (req, res) => {
     // console.log("Post request", JSON.stringify(req.body, undefined, 2));
@@ -101,12 +128,14 @@ app.get("/", (req, res) => {
     res.render("index.hbs", {pageTitle: "My ToDo App"});
 })
 
-app.listen(PORT, (err) => {
-    if (err) {
-        console.log("Failed to start server", err);
-    } else {
-        console.log("Server started successfully at PORT : ", PORT);
-    }
-});
+// if(!module.parent) {
+    app.listen(PORT, (err) => {
+        if (err) {
+            console.log("Failed to start server", err);
+        } else {
+            console.log("Server started successfully at PORT : ", PORT);
+        }
+    });
+// }
 
 module.exports = {app};

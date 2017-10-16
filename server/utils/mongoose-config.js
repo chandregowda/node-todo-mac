@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
 
-var mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017/Todo";
+var mongoURI = process.env.MONGODB_URI;
 mongoose.connect(mongoURI).then(()=>{
     console.log("Successfully connected to mongodb");
 }, (err) => {
