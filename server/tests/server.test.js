@@ -1,49 +1,17 @@
 const {app} = require("./../server");
 const {Todo} = require("./../models/todo");
-
+const {User} = require("./../models/user");
 const expect = require("expect");
 const request = require("supertest");
 // const request = require("supertest").agent(app.listen());
-const {
-    ObjectID
-} = require("mongodb");
+const {ObjectID} = require("mongodb");
 
+const {todos, populateTodos, users, populateUsers} = require("./seed/seed");
+// beforeEach(populateTodos);
 
-
-const {
-    User
-} = require("./../models/user");
-
-var todos = [{
-    text: "First todo",
-    _id: new ObjectID()
-}, {
-    text: "Second todo",
-    _id: new ObjectID()
-}];
-
-var users = [{
-    email: 'abc@xyz.com',
-    password: 'abcPassword'
-}, {
-    email: 'def@xyz.com',
-    password: 'defPassword'
-}];
-
-beforeEach((done) => {
-    Todo.remove({})
-        .then(() => {
-            return Todo.insertMany(todos);
-        });
-
-    User.remove({})
-        .then(() => {
-            return User.insertMany(users);
-        })
-        .then(() => done());
-});
-
-
+// beforeEach((done)=> {populateTodos()});
+beforeEach(populateTodos);
+beforeEach(populateUsers);
 
 describe('POST /todos', () => {
     it("should create new document", (done) => {
