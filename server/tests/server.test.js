@@ -249,3 +249,34 @@ describe('GET /users/me', () => {
             .end(done);
     });
 });
+
+describe("POST /users/login", () => {
+    it('should login when valid user email and password is sent', (done) => {
+        request(app)
+            .post('/users/login')
+            .send({email: users[0].email, password: users[0].password})
+            .expect(200)
+            .expect((res) => {
+                expect(res.headers['x-auth']).toBeTruthy();
+                expect(res.body.email).toBe(users[0].email);
+                expect(res.body._id).toBeTruthy();
+            })
+            .end(done);
+    });
+
+    it('should fail if email does not exists', (done) => {
+        request(app)
+            .post('/users/login')
+            .send({email:'invalid@email.com', password:'junk'})
+            .expect(400)
+            .end(done);
+    });
+
+    it('should fail if invalid credentials is sent', (done) => {
+        request(app)
+            .post('/users/login')
+            .send({email:users[0].email, password:'junk'})
+            .expect(400)
+            .end(done);
+    });
+});
