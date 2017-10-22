@@ -198,3 +198,17 @@ describe("POST /users", () => {
     }); // Should add new user record
 
 });
+
+describe('GET /users/me', () => {
+    it ('should get me the user when authenticated with Xtoken', (done) => {
+        request(app)
+            .get('/users/me')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            .end(done);
+    });
+
+    // it ('should not return any data when authenitcation fails', (done) => {
+
+    // });
+});

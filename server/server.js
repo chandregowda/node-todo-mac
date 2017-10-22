@@ -33,7 +33,7 @@ app.post('/users', (req, res) => {
 });
 
 app.get('/users/me', authenticate, (req, res) => {
-    res.send({user});
+    res.send(req.user);
 });
 
 app.post('/todos', (req, res) => {

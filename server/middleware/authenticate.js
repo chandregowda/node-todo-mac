@@ -1,9 +1,9 @@
 
-const {User} = "../models/user";
+const {User} = require("./../models/user");
 
 var authenticate = (req, res, next) => {
-    console.log("Getting User for token", req.header('x-auth'));
     var token = req.header('x-auth');
+    // console.log("Getting User for token: ", token);
 
     User.findByToken(token).then((user) => {
         if(!user) {
@@ -12,9 +12,9 @@ var authenticate = (req, res, next) => {
         req.user = user;
         next();
     }).catch((e) => {
+        console.log("Some error in authenticating:", e);
         res.status(401).send();
     });
-
 }
 
 module.exports = {authenticate};
