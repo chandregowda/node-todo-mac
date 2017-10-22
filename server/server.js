@@ -53,6 +53,14 @@ app.post('/users/login', (req, res) => {
         })
 });
 
+app.delete('/users/logout', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }, () => {
+        res.status(400).send();
+    })
+});
+
 app.post('/todos', (req, res) => {
     // console.log("Post request", JSON.stringify(req.body, undefined, 2));
     // res.json({error:null, response:{message:'success'}});

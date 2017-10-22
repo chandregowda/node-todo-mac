@@ -280,3 +280,29 @@ describe("POST /users/login", () => {
             .end(done);
     });
 });
+
+describe('DELETE /users/logout', () => {
+    it('should delete the existing token sent from header x-auth', (done) => {
+        var token = users[0].tokens[0].token;
+        request(app)
+            .delete('/users/logout')
+            .set('x-auth', token)
+            .expect(200)
+            .end((err)=>{
+                if(err) {
+                    done(err);
+                }
+                User.findOne({_id:users[0]._id}).then((user) => {
+                    expect(user.tokens.length).toBe(0);
+                    done();
+                }).catch((e) => done(e));
+            });
+    });
+
+    it('should send 401 if token is not sent in header x-auth', (done) => {
+        request(app)
+            .delete('/users/logout')
+            .expect(401)
+            .end(done);
+    });
+})
