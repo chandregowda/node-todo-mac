@@ -1,12 +1,25 @@
-const {app} = require("./../server");
-const {Todo} = require("./../models/todo");
-const {User} = require("./../models/user");
+const {
+    app
+} = require("./../server");
+const {
+    Todo
+} = require("./../models/todo");
+const {
+    User
+} = require("./../models/user");
 const expect = require("expect");
 const request = require("supertest");
 // const request = require("supertest").agent(app.listen());
-const {ObjectID} = require("mongodb");
+const {
+    ObjectID
+} = require("mongodb");
 
-const {todos, populateTodos, users, populateUsers} = require("./seed/seed");
+const {
+    todos,
+    populateTodos,
+    users,
+    populateUsers
+} = require("./seed/seed");
 // beforeEach(populateTodos);
 
 // beforeEach((done)=> {populateTodos()});
@@ -141,7 +154,10 @@ describe("POST /users", () => {
     it('should not add user with blank email', (done) => {
         request(app)
             .post('/users/')
-            .send({email:'', password:"something"})
+            .send({
+                email: '',
+                password: "something"
+            })
             .expect(404)
             .end(done);
     });
@@ -149,7 +165,10 @@ describe("POST /users", () => {
     it('should not add user with blank password', (done) => {
         request(app)
             .post('/users/')
-            .send({email:'valid@abc.com', password:""})
+            .send({
+                email: 'valid@abc.com',
+                password: ""
+            })
             .expect(404)
             .end(done);
     });
@@ -157,7 +176,10 @@ describe("POST /users", () => {
     it('should not add user if password length is < 6', (done) => {
         request(app)
             .post('/users')
-            .send({email: 'aaa@bbb.com', password:'5char'})
+            .send({
+                email: 'aaa@bbb.com',
+                password: '5char'
+            })
             .expect(404)
             .end(done);
     });
@@ -168,27 +190,32 @@ describe("POST /users", () => {
 
         request(app)
             .post('/users')
-            .send({email, password})
+            .send({
+                email,
+                password
+            })
             .expect(404)
             .end(done);
     });
     it('should add new User detail', (done) => {
+        const email = 'test@abc.com';
+        const password = 'testPassword';
         request(app)
             .post('/users')
-            .send({
-                email: 'test@abc.com',
-                password: 'testPass'
-            })
+            .send({email,password})
             .expect(200)
             .expect((res) => {
-                expect(res.body.email).toBe('test@abc.com')
+                expect(res.body.email).toBe('test@abc.com');
+                expect(res.headers['x-auth']).toBeTruthy();
+                expect(res.body['_id']).toBeTruthy();
             })
-            .end((err, res) => {
+            .end((err) => {
                 if (err) {
                     return done(err);
                 }
-                User.find().then((users) => {
-                        expect(users.length).toBe(3);
+                User.findOne({email}).then((user) => {
+                        expect(user).toBeTruthy();
+                        expect(user.password).not.toBe(password);
                         done();
                     })
                     .catch((e) => {
@@ -200,15 +227,25 @@ describe("POST /users", () => {
 });
 
 describe('GET /users/me', () => {
-    it ('should get me the user when authenticated with Xtoken', (done) => {
+    it('should get me the user when authenticated with x-auth header token', (done) => {
         request(app)
             .get('/users/me')
             .set('x-auth', users[0].tokens[0].token)
             .expect(200)
+            .expect((res) => {
+                expect(res.body.email).toBe(users[0].email);
+            })
             .end(done);
     });
 
-    // it ('should not return any data when authenitcation fails', (done) => {
-
-    // });
+    it('should not return any data when authenitcation fails', (done) => {
+        request(app)
+            .get('/users/me')
+            .set('x-auth', 'invalidToken')
+            .expect(401)
+            .expect((res) => {
+                expect(res.body).toEqual({})
+            })
+            .end(done);
+    });
 });

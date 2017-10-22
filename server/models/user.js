@@ -54,7 +54,7 @@ UserSchema.statics.findByToken = function(token) {
     try {
         decoded = jwt.verify(token, 'secretKey');
     }catch (e) {
-        console.log("Some JWT error during decode", e);
+        // console.log("Some JWT error during decode", e);
         return Promise.reject();
     }
     return User.findOne({

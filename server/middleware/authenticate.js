@@ -12,7 +12,7 @@ var authenticate = (req, res, next) => {
         req.user = user;
         next();
     }).catch((e) => {
-        console.log("Some error in authenticating:", e);
+        // console.log("Some error in authenticating:", e);
         res.status(401).send();
     });
 }
