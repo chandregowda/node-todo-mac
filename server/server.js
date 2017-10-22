@@ -36,6 +36,23 @@ app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
 
+app.post('/users/login', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    if (!body) {
+        res.status(400).send({error:true, message:"Invalid email / password"});
+    }
+    User.login(body)
+        .then((user) => {
+            // res.send(user);
+            return user.generateAuthToken().then((token) => {
+                res.header('x-auth', token).send(user);
+            });
+        })
+        .catch((e) => {
+            res.status(400).send({error:true, message:"User authentication failed"});
+        })
+});
+
 app.post('/todos', (req, res) => {
     // console.log("Post request", JSON.stringify(req.body, undefined, 2));
     // res.json({error:null, response:{message:'success'}});
