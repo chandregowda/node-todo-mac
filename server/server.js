@@ -21,8 +21,8 @@ app.use(bodyParser.json());
 app.set("view engine", 'hbs');
 
 app.post('/users', (req, res) => {
-    var data = _.pick(req.body, ['email', 'password']);
-    var user = new User(data);
+    var body = _.pick(req.body, ['email', 'password']);
+    var user = new User(body);
     user.save().then(() => {
         return user.generateAuthToken();
     }).then((token)=>{
