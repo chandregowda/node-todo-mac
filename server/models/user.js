@@ -52,9 +52,7 @@ UserSchema.statics.findByToken = function(token) {
         decoded = jwt.verify(token, 'secretKey');
     }catch (e) {
         console.log("Some JWT error during decode", e);
-        return new Promise((resolve, reject)=>{
-            resolve({});
-        });
+        return Promise.reject();
     }
     return User.findOne({
         "_id": decoded._id, "tokens.token" : token, "tokens.access":'auth'

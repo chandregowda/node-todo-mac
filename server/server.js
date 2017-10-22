@@ -12,6 +12,7 @@ const _ = require("lodash");
 const {mongoose} = require('./utils/mongoose-config');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
+const {authenticate} = require("./middleware/authenticate");
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,16 +32,8 @@ app.post('/users', (req, res) => {
     });
 });
 
-app.get('/users/me', (req, res) => {
-    console.log("Getting User for token", req.header('x-auth'));
-    var token = req.header('x-auth');
-
-    User.findByToken(token).then((user) => {
-        if(!user) {
-            return res.status(400).send();
-        }
-        res.send({user});
-    });
+app.get('/users/me', authenticate, (req, res) => {
+    res.send({user});
 });
 
 app.post('/todos', (req, res) => {
